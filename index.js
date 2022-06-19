@@ -10,7 +10,7 @@ AppRegistry.registerComponent(appName, () => App);
 
 // 關閉模擬器內的黃色警告
 console.ignoredYellowBox = ['Warning: BackAndroid is deprecated. Please use BackHandler instead.','source.uri should not be an empty string','Invalid props.style key'];
-console.disableYe
+console.disableYellowBox = true;
 
 // VSCode運行
 // 要用CMD或者PowerShell運行
