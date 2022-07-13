@@ -1,10 +1,12 @@
-import React, {useState, useRef} from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import {
     Text,
     StyleSheet,
     Dimensions,
     Animated,
     TouchableOpacity,
+    Platform,
+    BackHandler, // Android only
 } from 'react-native';
 
 import {pxToDp} from '../utils/stylesKits';
@@ -38,6 +40,7 @@ const IntegratedWebView = ({source, needRefresh, triggerRefresh}) => {
     // 點擊後退按鈕觸發
     const handleBackPress = () => {
         webViewRef.current.goBack();
+        console.log("Back");
     };
 
     // 點擊前進按鈕觸發
@@ -92,7 +95,7 @@ const IntegratedWebView = ({source, needRefresh, triggerRefresh}) => {
                     scrollY.setValue(syntheticEvent.nativeEvent.contentOffset.y);
                     const webViewHeight = syntheticEvent.nativeEvent.layoutMeasurement.height;
                     const contentHeight = syntheticEvent.nativeEvent.contentSize.height;
-                    webViewHeight < contentHeight + contentHeight * 0.15 ? setIsContentHeightExcceed(false) : setIsContentHeightExcceed(true);
+                    contentHeight > webViewHeight + webViewHeight * 0.15  ? setIsContentHeightExcceed(true) : setIsContentHeightExcceed(false);
                 }}
                 pullToRefreshEnabled={true}
             />
