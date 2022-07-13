@@ -22,6 +22,8 @@ const IntegratedWebView = ({source, needRefresh, triggerRefresh}) => {
     const [canGoBack, setCanGoBack] = useState(false);
     const [canGoForward, setCanGoForward] = useState(false);
 
+    const [isContentHeightExcceed, setIsContentHeightExcceed] = useState(false);
+
     // 動畫的參數設定
     const scrollY = new Animated.Value(0);
     const diffClamp = Animated.diffClamp(scrollY, 0, window.height * 0.08);
@@ -76,15 +78,21 @@ const IntegratedWebView = ({source, needRefresh, triggerRefresh}) => {
                     setLoaded(false);
                     setProgress(0);
                 }}
-                onLoadEnd={() => setLoaded(true)}
+                onLoadEnd={(syntheticEvent) => { 
+                    setLoaded(true);
+                    console.dir(syntheticEvent.nativeEvent);
+                }}
                 onNavigationStateChange={state => {
                     const back = state.canGoBack;
                     const forward = state.canGoForward;
                     setCanGoBack(back);
                     setCanGoForward(forward);
                 }}
-                onScroll={e => {
-                    scrollY.setValue(e.nativeEvent.contentOffset.y);
+                onScroll={syntheticEvent => {
+                    scrollY.setValue(syntheticEvent.nativeEvent.contentOffset.y);
+                    const webViewHeight = syntheticEvent.nativeEvent.layoutMeasurement.height;
+                    const contentHeight = syntheticEvent.nativeEvent.contentSize.height;
+                    webViewHeight < contentHeight + contentHeight * 0.15 ? setIsContentHeightExcceed(false) : setIsContentHeightExcceed(true);
                 }}
                 pullToRefreshEnabled={true}
             />
@@ -96,6 +104,7 @@ const IntegratedWebView = ({source, needRefresh, triggerRefresh}) => {
                 canGoBack={canGoBack}
                 canGoForward={canGoForward}
                 translateY={translateY}
+                isContentHeightExcceed={isContentHeightExcceed}
             />
         </>
     );
@@ -108,10 +117,11 @@ const NavigationView = ({
     canGoBack,
     canGoForward,
     translateY,
+    isContentHeightExcceed
 }) => {
     return (
         // 判斷: 網站能前後跳轉的時候才顯示WebView底部導航欄
-        (canGoBack || canGoForward) && (
+        ((canGoBack || canGoForward ) && isContentHeightExcceed) && (
             <Animated.View
                 style={[
                     styles.container,
